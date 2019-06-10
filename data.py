@@ -18,7 +18,8 @@ url_fiyat="http://finans.mynet.com/borsa/hisseler/acsel-acipayam-seluloz/"
 response_fiyat=requests.get(url_fiyat)
 html_fiyat_icerigi = response_fiyat.content
 soup_fiyat=BeautifulSoup(html_fiyat_icerigi,"html.parser")
-hisse_fiyati = soup_fiyat.find_all("meta",{"itemprop":"price"})
+
+hisse_fiyati = soup_fiyat.find("span",{"class":"dtColTwo"})
 print(response_fiyat)
 #basliklar = soup.find_all("td",{"class":"titleColumn"})
 #ratingler = soup.find_all("td",{"class","ratingColumn imdbRating"})
