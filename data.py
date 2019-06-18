@@ -9,10 +9,14 @@ response = requests.get(url)
 html_icerigi = response.content
 soup = BeautifulSoup(html_icerigi,"html.parser")
 print(response)
-#a = input("Hisse adı giriniz:")
-#a=a.upper()
+a = input("Hisse adı giriniz:")
+a=a.upper()
 
 hisse_adi=soup.find_all("td",{"class":"ndt-leftText ndt-noBorderRight"})
+#print(hisse_adi)
+
+if a in hisse_adi:
+    print(hisse_adi)
 
 url_fiyat="http://finans.mynet.com/borsa/hisseler/acsel-acipayam-seluloz/"
 response_fiyat=requests.get(url_fiyat)
