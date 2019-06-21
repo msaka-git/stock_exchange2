@@ -66,5 +66,7 @@ class hisse():
 
 
 
+
+
 Hisse=hisse()
 Hisse.fiyat_sorgula()
