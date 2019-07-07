@@ -316,48 +316,62 @@ class hisse():
             return self.gw_10years_yuzde
 
     def peg_yearly(self):
-
-        self.gw_rate=(self.my_float_gr1 - self.my_float_gr2) / self.my_float_gr2
-        self.gw_rate=self.gw_rate * 100
-        self.peg_yearly=round(self.my_float_fk / self.gw_rate,2)
-        return self.peg_yearly
+        try:
+            self.gw_rate=(self.my_float_gr1 - self.my_float_gr2) / self.my_float_gr2
+            self.gw_rate=self.gw_rate * 100
+            self.peg_yearly=round(self.my_float_fk / self.gw_rate,2)
+            return self.peg_yearly
+        except AttributeError:
+            self.peg_yearly="Dönem kar veya zararı bulunamadı."
+            return self.peg_yearly
 
     def peg_5years(self):
-        self.gw_5years = self.my_float_gr1 / self.my_float_gr2
-        self.gw_5years_rate = (self.gw_5years ** 0.2) - 1
-        self.gw_5years_yuzde = round(self.gw_5years_kuvvet * 100, 2)
-        self.peg_5y = round(self.my_float_fk / self.gw_5years_yuzde,2)
-        return self.peg_5y
+        try:
+            self.gw_5years = self.my_float_gr1 / self.my_float_gr2
+            self.gw_5years_rate = (self.gw_5years ** 0.2) - 1
+            self.gw_5years_yuzde = round(self.gw_5years_kuvvet * 100, 2)
+            self.peg_5y = round(self.my_float_fk / self.gw_5years_yuzde,2)
+            return self.peg_5y
+        except AttributeError:
+            self.peg_yearly="Dönem kar veya zararı bulunamadı."
+            return self.peg_yearly
+
 
 
     def fair_value(self):
-        self.fv=round(self.gw * self.hisse_eps,2)
-        return self.fv
+        try:
+            self.fv=round(self.gw * self.hisse_eps,2)
+            return self.fv
+        except TypeError:
+            self.fv="Veri bulunamadı."
+            return self.fv
 
     def yorum_hisse(self):
-        if (self.gw > float(0)) and (self.gw <= float(25)):
-            if (self.fv < self.my_float) and (self.peg_yearly < float(1)) and (self.my_float_pd_dd < float(1)) and \
-                (self.peg_5y < float(1)):
-                return "Hissenin FV'si güncel fiyatından düşük, fiyat ucuz.\nYıllık PEG 1'den düşük\nPiyasa değeri defter değerinden düşük.\n" \
+        try:
+            if (self.gw > float(0)) and (self.gw <= float(25)):
+                if (self.fv < self.my_float) and (self.peg_yearly < float(1)) and (self.my_float_pd_dd < float(1)) and \
+                    (self.peg_5y < float(1)):
+                    return "Hissenin FV'si güncel fiyatından düşük, fiyat ucuz.\nYıllık PEG 1'den düşük\nPiyasa değeri defter değerinden düşük.\n" \
                        "5 yıllık PEG de 1'den düşük\nSanırım çok ucuz bir hisse yakaladın: Sonuç ÇOK OLUMLU."
-            elif (self.fv < self.my_float) and (self.peg_yearly < float(1)) and (self.my_float_pd_dd < float(1)):
-                return "Hissenin FV'si güncel fiyatından düşük, fiyat ucuz.\nPiyasa değeri defter değerinden düşük.\n" \
-                       "Yıllık PEG 1'den düşük. Fakat 5 yıllık PEG fazla: OLUMLU."
-            elif (self.peg_yearly < float(1)) and (self.my_float_pd_dd < float(1)):
-                return "PEG ve pd/dd olması gerekenin altında.\nYıllık bazda hisse makul gibi gözüküyor. Fair Value'ye (Adil fiyat).\n" \
-                       "Ayrıca şu anda hisse fiyatı {}'nın altında mı?.\nSonuç: Yıllık olarak makul gibi. Teknik analiz lazım.".format(self.hisse_eps * self.my_float_fk)
-            elif (self.gw > self.my_float_fk):
-                return "Büyüme oranı şu anki fiyat kazançtan yüksek. Bu çok olumlu.\nDiğer indikatörlere bak.\n" \
-                       "Teknik analiz yap. Büyüme oranları çok fahiş olmamalı.\nFiyat karşılaştırması yaparken geçmiş verileri incele.\n" \
-                       "Sonuç: Potansiyel var ama RISK büyük."
+                elif (self.fv < self.my_float) and (self.peg_yearly < float(1)) and (self.my_float_pd_dd < float(1)):
+                    return "Hissenin FV'si güncel fiyatından düşük, fiyat ucuz.\nPiyasa değeri defter değerinden düşük.\n" \
+                           "Yıllık PEG 1'den düşük. Fakat 5 yıllık PEG fazla: OLUMLU."
+                elif (self.peg_yearly < float(1)) and (self.my_float_pd_dd < float(1)):
+                    return "PEG ve pd/dd olması gerekenin altında.\nYıllık bazda hisse makul gibi gözüküyor. Fair Value'ye (Adil fiyat).\n" \
+                           "Ayrıca şu anda hisse fiyatı {}'nın altında mı?.\nSonuç: Yıllık olarak makul gibi. Teknik analiz lazım.".format(self.hisse_eps * self.my_float_fk)
+                elif (self.gw > self.my_float_fk):
+                    return "Büyüme oranı şu anki fiyat kazançtan yüksek. Bu çok olumlu.\nDiğer indikatörlere bak.\n" \
+                           "Teknik analiz yap. Büyüme oranları çok fahiş olmamalı.\nFiyat karşılaştırması yaparken geçmiş verileri incele.\n" \
+                           "Sonuç: Potansiyel var ama RISK büyük."
+
+                else:
+                    return "Fiyatın ucuz olduğuna dair olumlu bir gösterge bulamadım."
 
             else:
-                return "Fiyatın ucuz olduğuna dair olumlu bir gösterge bulamadım."
+                return "Büyüme oranı yüzde 25'in üstünde veya değerler ekside.\nHesaplama gerçeği yansıtmıyor."
 
-        else:
-            return "Büyüme oranı yüzde 25'in üstünde veya değerler ekside.\nHesaplama gerçeği yansıtmıyor."
-
-
+        except TypeError:
+            return "Veri bulunamadı."
 
     def menu(self):
         self.fiyat_sorgula()
@@ -372,9 +386,12 @@ class hisse():
         self.peg_5years()
         self.fair_value()
         self.yorum_hisse()
-        sonuc=hisse_properties(self.a,self.my_float,self.my_float_fk,self.hisse_eps,self.peg,self.peg_yearly,self.peg_5y,self.my_float_pd_dd,self.gw,
-                               self.gw_5years_yuzde,self.gw_10years_yuzde,self.fv,self.yorum_hisse())
-        print(sonuc)
+        try:
+            sonuc=hisse_properties(self.a,self.my_float,self.my_float_fk,self.hisse_eps,self.peg,self.peg_yearly,self.peg_5y,self.my_float_pd_dd,self.gw,
+                                   self.gw_5years_yuzde,self.gw_10years_yuzde,self.fv,self.yorum_hisse())
+            print(sonuc)
+        except AttributeError:
+            print("Bazı veriler bulunamadı.")
 
 
 
