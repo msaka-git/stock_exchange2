@@ -38,6 +38,7 @@ class hisse():
     def query(self):
         url_akbank = "https://yatirim.akbank.com/tr-tr/hisse-senedi/Sayfalar/hisse-senet-detay.aspx?hisse={}".format(
             self.a.upper())
+
         response_akbank = requests.get(url_akbank)
         html_icerigi_akbank = response_akbank.content
         self.soup_akbank = BeautifulSoup(html_icerigi_akbank, "html.parser")
@@ -231,7 +232,6 @@ class hisse():
             self.my_float_e = float(commas_removed_e)  # turn from string to float.
 
         for kar in self.hisse_fk[12]:
-
 
             self.net_kar = kar.text
             self.net_kar=self.net_kar.replace(',','.')
