@@ -36,12 +36,18 @@ class hisse():
         self.hisse_adi()
 
     def query(self):
-        url_akbank = "https://yatirim.akbank.com/tr-tr/hisse-senedi/Sayfalar/hisse-senet-detay.aspx?hisse={}".format(
+        url_isbank = "https://www.isyatirim.com.tr/tr-tr/analiz/hisse/sayfalar/sirket-karti.aspx?hisse={}".format(
             self.a.upper())
 
-        response_akbank = requests.get(url_akbank)
-        html_icerigi_akbank = response_akbank.content
-        self.soup_akbank = BeautifulSoup(html_icerigi_akbank, "html.parser")
+        response_isbank = requests.get(url_isbank)
+        html_icerigi_isbank = response_isbank.content
+        self.soup_isbank = BeautifulSoup(html_icerigi_isbank, "html.parser")
+
+        ####
+        url_bgundem="https://www.borsagundem.com/piyasa-ekrani/hisse-detay/{}".format(self.a.upper())
+        response_bgundem=requests.get(url_bgundem)
+        html_icerigi_bgundem=response_bgundem.content
+        self.soup_bgundem=BeautifulSoup(html_icerigi_bgundem,"html.parser")
 
 
     def hisse_adi(self):
@@ -108,6 +114,7 @@ class hisse():
             url_fiyat = "http://finans.mynet.com/" + h
             self.url_fiyat_gwrate=url_fiyat + "bilanco" + "/" + str(year1) + "-12" + "/" + "0"
             self.url_fiyat_gwrate2=url_fiyat + "bilanco" + "/" + str(year2) + "-12" + "/" + "0"
+            self.url_fiyat_info=url_fiyat + "sirket-bilgileri"
             if self.a in url_fiyat:
 
                 response_fiyat = requests.get(url_fiyat)
@@ -129,7 +136,7 @@ class hisse():
             url_fiyat_ce = "http://finans.mynet.com/" + h_ce
             self.url_fiyat_gwrate = url_fiyat_ce + "bilanco" + "/" + str(year1) + "-12" + "/" + "0"
             self.url_fiyat_gwrate2 = url_fiyat_ce + "bilanco" + "/" + str(year2) + "-12" + "/" + "0"
-
+            self.url_fiyat_info = url_fiyat_ce + "sirket-bilgileri"
             if self.a in url_fiyat_ce:
                 response_fiyat = requests.get(url_fiyat_ce)
 
@@ -149,6 +156,7 @@ class hisse():
             url_fiyat_fj = "http://finans.mynet.com/" + h_fj
             self.url_fiyat_gwrate = url_fiyat_fj + "bilanco" + "/" + str(year1) + "-12" + "/" + "0"
             self.url_fiyat_gwrate2 = url_fiyat_fj + "bilanco" + "/" + str(year2) + "-12" + "/" + "0"
+            self.url_fiyat_info = url_fiyat_fj + "sirket-bilgileri"
             if self.a in url_fiyat_fj:
                 response_fiyat = requests.get(url_fiyat_fj)
 
@@ -168,6 +176,7 @@ class hisse():
             url_fiyat_kq = "http://finans.mynet.com/" + h_kq
             self.url_fiyat_gwrate = url_fiyat_kq + "bilanco" + "/" + str(year1) + "-12" + "/" + "0"
             self.url_fiyat_gwrate2 = url_fiyat_kq + "bilanco" + "/" + str(year2) + "-12" + "/" + "0"
+            self.url_fiyat_info = url_fiyat_kq + "sirket-bilgileri"
             if self.a in url_fiyat_kq:
 
                 response_fiyat = requests.get(url_fiyat_kq)
@@ -188,6 +197,7 @@ class hisse():
             url_fiyat_rz = "http://finans.mynet.com/" + h_rz
             self.url_fiyat_gwrate = url_fiyat_rz + "bilanco" + "/" + str(year1) + "-12" + "/" + "0"
             self.url_fiyat_gwrate2 = url_fiyat_rz + "bilanco" + "/" + str(year2) + "-12" + "/" + "0"
+            self.url_fiyat_info = url_fiyat_rz + "sirket-bilgileri"
             if self.a in url_fiyat_rz:
 
                 response_fiyat = requests.get(url_fiyat_rz)
@@ -206,57 +216,60 @@ class hisse():
 
     def fiyat_kazanc(self):
         self.query()
-        self.hisse_fk=self.soup_akbank.find_all("span", {"class": "pull-right"})
+        #self.hisse_fk=self.soup_isbank.select_one('th:contains("F/K") + td').text
+        #hisse_fk=self.soup_isbank.find_all('div', {'id': 'ozetFinansalGostergeler1'})
+        hisse_fk=self.soup_bgundem.select_one('p:contains("FK") + span').text
 
-        for fk in self.hisse_fk[5]:
-            self.hisse_fk=fk.text
-            my_string_fk = self.hisse_fk
-            commas_removed_fk = my_string_fk.replace(',', '.')  # remove comma separation
-            self.my_float_fk = float(commas_removed_fk)
-
-            return self.my_float_fk
+        h_fk = hisse_fk.replace(',', '.')
+        h_fk = float(h_fk)
+        self.my_float_fk = h_fk
+        return self.my_float_fk
 
 
     def eps(self):
         self.fiyat_sorgula()
         self.query()
-        self.hisse_fk = self.soup_akbank.find_all("span", {"class": "pull-right"})
+        response_fiyat = requests.get(self.url_fiyat_info)
+        html_content_fiyat = response_fiyat.content
+        soup_finans = BeautifulSoup(html_content_fiyat, "html.parser")
+
+        self.hisse_adet = soup_finans.select_one('span:contains("Piyasa Değeri") + span').text
+        string = self.hisse_adet[:-2]
+
+        h_adeti = string.replace(',', '.')
+
+        my_string_e = h_adeti
+        commas_removed_e = my_string_e.replace('.', '')  # remove comma separation
+        self.my_float_e = float(commas_removed_e)  # turn from string to float. Share amount.
 
 
-        for adet in self.hisse_fk[9]:
+        #### NET Donem Kari ######
+        urlkar = "https://yatirim.akbank.com/tr-tr/hisse-senedi/Sayfalar/hisse-senet-detay.aspx?hisse=" + self.a
+        response_kar = requests.get(urlkar)
+        html_content_kar = response_kar.content
+        soup_kar = BeautifulSoup(html_content_kar, "html.parser")
+        kar = soup_kar.select_one('td:contains("- Ana Ortaklık Payları") + td + td').text
 
-            self.h_adeti=adet.replace(',','.')
+        h_kar = kar.replace(',', '.')
+        commas_removed_kar = h_kar.replace('.', '')
+        self.my_float_kar = float(commas_removed_kar)
 
-            my_string_e = self.h_adeti
-            commas_removed_e = my_string_e.replace('.', '')  # remove comma separation
-            self.my_float_e = float(commas_removed_e)  # turn from string to float.
-
-        for kar in self.hisse_fk[12]:
-
-            self.net_kar = kar.text
-            self.net_kar=self.net_kar.replace(',','.')
-
-            my_string_k = self.net_kar
-            commas_removed_k = my_string_k.replace('.', '')  # remove comma separation
-            self.my_float_k = float(commas_removed_k)  # turn from string to float.
-
-            tedavul_hisse=self.my_float_e / self.my_float
-            self.hisse_eps=round((self.my_float_k / tedavul_hisse),2)
-            return self.hisse_eps
-
+        ##### Shares in circulation #######
+        self.hisse_tedavul=self.my_float_e / self.my_float
+        self.hisse_eps=round((self.my_float_kar / self.hisse_tedavul),2)
+        return self.hisse_eps
 
     def pd_dd(self):
-
-
         self.query()
-        self.hisse_pd_dd = self.soup_akbank.find_all("span", {"class": "pull-right"})
+        #self.hisse_pd_dd = self.soup_isbank.select_one('th:contains("PD/DD") + td').text
+        #hisse_pd_dd=self.soup_isbank.find_all('div', {'id': 'ozetFinansalGostergeler1'})
+        hisse_pd_dd=self.soup_bgundem.select_one('p:contains("PD/DD") + span').text
 
-        for i in self.hisse_pd_dd[6]:
-            self.hisse_pd_dd=i.text
-            self.hisse_pd_dd = self.hisse_pd_dd.replace(',', '.')
-            self.my_float_pd_dd = float(self.hisse_pd_dd)
-            return self.my_float_pd_dd
+        h_pddd = hisse_pd_dd.replace(',', '.')
+        h_pddd = float(h_pddd)
 
+        self.my_float_pd_dd = h_pddd
+        return self.my_float_pd_dd
 
     def peg_calcul(self):
 
