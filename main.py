@@ -248,7 +248,8 @@ class hisse():
         response_kar = requests.get(urlkar)
         html_content_kar = response_kar.content
         soup_kar = BeautifulSoup(html_content_kar, "html.parser")
-        kar = soup_kar.select_one('td:contains("- Ana Ortaklık Payları") + td + td').text
+        #kar = soup_kar.select_one('td:contains("- Ana Ortaklık Payları") + td + td').text
+        kar = soup_kar.select_one('td:contains("Net Dönem Karı/Zararı") + td').text
 
         h_kar = kar.replace(',', '.')
         commas_removed_kar = h_kar.replace('.', '')
@@ -361,7 +362,7 @@ class hisse():
 
     def yorum_hisse(self):
         try:
-            if (self.gw > float(0)) and (self.gw <= float(25)):
+            if (self.gw > float(0)) and (self.gw <= float(30)):
                 if (self.fv < self.my_float) and (self.peg_yearly < float(1)) and (self.my_float_pd_dd < float(1)) and \
                     (self.peg_5y < float(1)):
                     return "Hissenin FV'si güncel fiyatından düşük, fiyat ucuz.\nYıllık PEG 1'den düşük\nPiyasa değeri defter değerinden düşük.\n" \
@@ -381,7 +382,7 @@ class hisse():
                     return "Fiyatın ucuz olduğuna dair olumlu bir gösterge bulamadım."
 
             else:
-                return "Büyüme oranı yüzde 25'in üstünde veya değerler ekside.\nHesaplama gerçeği yansıtmıyor."
+                return "Büyüme oranı yüzde 30'in üstünde veya değerler ekside.\nHesaplama gerçeği yansıtmıyor."
 
         except TypeError:
             return "Veri bulunamadı."
