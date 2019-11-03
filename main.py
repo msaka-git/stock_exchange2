@@ -371,7 +371,7 @@ class hisse():
                     return "Hissenin FV'si güncel fiyatından düşük, fiyat ucuz.\nPiyasa değeri defter değerinden düşük.\n" \
                            "Yıllık PEG 1'den düşük. Fakat 5 yıllık PEG fazla: OLUMLU."
                 elif (self.peg_yearly < float(1)) and (self.my_float_pd_dd < float(1)):
-                    return "PEG ve pd/dd olması gerekenin altında.\nYıllık bazda hisse makul gibi gözüküyor. Fair Value'ye (Adil fiyat).\n" \
+                    return "PEG ve pd/dd olması gerekenin altında.\nYıllık bazda hisse makul gibi gözüküyor. Fair Value'ye (Adil fiyat) bak.\n" \
                            "Ayrıca şu anda hisse fiyatı {}'nın altında mı?.\nSonuç: Yıllık olarak makul gibi. Teknik analiz lazım.".format(self.hisse_eps * self.my_float_fk)
                 elif (self.gw > self.my_float_fk):
                     return "Büyüme oranı şu anki fiyat kazançtan yüksek. Bu çok olumlu.\nDiğer indikatörlere bak.\n" \
