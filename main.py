@@ -131,48 +131,54 @@ class hisse():
 
     def eps(self):
 
-        response_fiyat = requests.get(self.url_fiyat_info)
-        html_content_fiyat = response_fiyat.content
-        soup_finans = BeautifulSoup(html_content_fiyat, "html.parser")
-        self.hisse_adet=soup_finans.select_one('td:contains("Toplam") + td').text
-
-        #self.hisse_adet = soup_finans.select_one('span:contains("Piyasa Değeri") + span').text #ARTIK CALISMIYOR
+        try:
 
 
-        string = self.hisse_adet[:-2]
+            response_fiyat = requests.get(self.url_fiyat_info)
+            html_content_fiyat = response_fiyat.content
+            soup_finans = BeautifulSoup(html_content_fiyat, "html.parser")
+            self.hisse_adet=soup_finans.select_one('td:contains("Toplam") + td').text
 
-        h_adeti = string.replace(',', '.')
-
-        my_string_e = h_adeti
-
-
-        commas_removed_e = my_string_e.replace('.', '')  # remove comma separation
-        self.my_float_e = float(commas_removed_e)  # turn from string to float. Share amount.
+            #self.hisse_adet = soup_finans.select_one('span:contains("Piyasa Değeri") + span').text #ARTIK CALISMIYOR
 
 
-        #### NET Donem Kari ######
-        urlkar = "https://yatirim.akbank.com/tr-tr/hisse-senedi/Sayfalar/hisse-senet-detay.aspx?hisse=" + self.a
-        response_kar = requests.get(urlkar)
-        html_content_kar = response_kar.content
-        soup_kar = BeautifulSoup(html_content_kar, "html.parser")
-        #kar = soup_kar.select_one('td:contains("- Ana Ortaklık Payları") + td + td').text
-        kar = soup_kar.select_one('td:contains("Net Dönem Karı/Zararı") + td').text
+            string = self.hisse_adet[:-2]
+
+            h_adeti = string.replace(',', '.')
+
+            my_string_e = h_adeti
 
 
-        h_kar = kar.replace(',', '.')
+            commas_removed_e = my_string_e.replace('.', '')  # remove comma separation
+            self.my_float_e = float(commas_removed_e)  # turn from string to float. Share amount.
 
-        commas_removed_kar = h_kar.replace('.', '')
-        commas_removed_kar=commas_removed_kar[:-2]
 
-        self.my_float_kar = float(commas_removed_kar)
+            #### NET Donem Kari ######
+            urlkar = "https://yatirim.akbank.com/tr-tr/hisse-senedi/Sayfalar/hisse-senet-detay.aspx?hisse=" + self.a
+            response_kar = requests.get(urlkar)
+            html_content_kar = response_kar.content
+            soup_kar = BeautifulSoup(html_content_kar, "html.parser")
+            #kar = soup_kar.select_one('td:contains("- Ana Ortaklık Payları") + td + td').text
+            kar = soup_kar.select_one('td:contains("Net Dönem Karı/Zararı") + td').text
 
-        ##### Shares in circulation #######
-        #self.hisse_tedavul=self.my_float_e / self.my_float
 
-        #self.hisse_eps=round((self.my_float_kar / self.hisse_tedavul),2) YANLIS HESEPLAMA EPS= NET KAR / TOPLAM HISSE ADETI
+            h_kar = kar.replace(',', '.')
 
-        self.hisse_eps=round((self.my_float_kar / self.my_float_e),2)
-        return self.hisse_eps
+            commas_removed_kar = h_kar.replace('.', '')
+            commas_removed_kar=commas_removed_kar[:-2]
+
+            self.my_float_kar = float(commas_removed_kar)
+
+            ##### Shares in circulation #######
+            #self.hisse_tedavul=self.my_float_e / self.my_float
+
+            #self.hisse_eps=round((self.my_float_kar / self.hisse_tedavul),2) YANLIS HESEPLAMA EPS= NET KAR / TOPLAM HISSE ADETI
+
+            self.hisse_eps=round((self.my_float_kar / self.my_float_e),2)
+            return self.hisse_eps
+
+        except AttributeError:
+            print("Grow rate veya bazi degerler sifira bolunemedigi icin sonuca ulasilamiyor.")
 
 
     def pd_dd(self):
@@ -238,7 +244,9 @@ class hisse():
             self.gw="Eksi değer veya geçersiz değer"
             return self.gw
 
-
+        except ZeroDivisionError:
+            self.gw = "Sifira bolunme hatasi\nGrow rate 0 olabilir."
+            return self.gw
 
 
     def base_growth_rate5y(self):
@@ -255,7 +263,9 @@ class hisse():
             self.gw_5years_yuzde = "Eksi değer veya geçersiz değer"
             return self.gw_5years_yuzde
 
-
+        except ZeroDivisionError:
+            self.gw = "Sifira bolunme hatasi\nGrow rate 0 olabilir."
+            return self.gw
 
 
     def base_growth_rate10y(self):
@@ -268,6 +278,10 @@ class hisse():
         except AttributeError:
             self.gw_10years_yuzde = "Eksi değer veya geçersiz değer"
             return self.gw_10years_yuzde
+
+        except ZeroDivisionError:
+            self.gw = "Sifira bolunme hatasi\nGrow rate 0 olabilir."
+            return self.gw
 
 
 
@@ -283,7 +297,9 @@ class hisse():
             self.peg_yearly="Dönem kar veya zararı bulunamadı."
             return self.peg_yearly
 
-
+        except ZeroDivisionError:
+            self.gw = "Sifira bolunme hatasi\nGrow rate 0 olabilir."
+            return self.gw
 
     def peg_5years(self):
         try:
@@ -295,7 +311,9 @@ class hisse():
         except AttributeError:
             self.peg_yearly="Dönem kar veya zararı bulunamadı."
             return self.peg_yearly
-
+        except ZeroDivisionError:
+            self.gw = "Sifira bolunme hatasi\nGrow rate 0 olabilir."
+            return self.gw
 
 
     def fair_value(self):
